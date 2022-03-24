@@ -107,7 +107,7 @@ while fechar == True:
                navegador.find_element_by_xpath('//*[@id="submeter"]').click()
           
           print("processo finalizado\nAguarde...")
-          time.sleep(3)
+          time.sleep(2)
           os.system('cls') or None
           conferenciaE()
           navegador.close()
