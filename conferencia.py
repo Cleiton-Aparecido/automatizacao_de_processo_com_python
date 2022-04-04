@@ -18,24 +18,3 @@ pyautogui.hotkey("Tab")
 pyperclip.copy("123")
 pyautogui.hotkey("ctrl","v")
 pyautogui.hotkey("Enter")
-#conferencia
-url = navegador.current_url
-navegador.get(url)
-tabela = pd.read_excel('mudanca.xlsx')
-colunaSerial = tabela['Serial']
-for linha in colunaSerial:
-    navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').click()
-    pyperclip.copy(linha)
-    pyautogui.hotkey("ctrl","v")
-    conf = navegador.find_element_by_xpath('//*[@id="dataTable"]/tbody/tr/td[6]').text
-    
-    if conf == 'ESTOQUE':
-        print("Estoque: ",conf," Numero de serie: ",linha)
-    else:
-        print("\n\n\n\nContém pos em status configurado\nEquipamento esta configurado: ",linha)
-        navegador.close()
-        break
-    navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').clear()
-navegador.close()
-print("finalizar")
-        
