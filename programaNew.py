@@ -176,7 +176,7 @@ def insecao():
 # senha = input("senha: ")
 fechar = True
 log = "douglas m"
-senha = 'tibolt2022'
+senha = 'senha'
 while fechar == True:
     cont = 0
     opcao = int(
