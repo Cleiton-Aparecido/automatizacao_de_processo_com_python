@@ -1,3 +1,5 @@
+from __future__ import barry_as_FLUFL
+from ast import Break
 from sqlite3 import Time
 import pyautogui
 import pyperclip
@@ -9,7 +11,54 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import os
+import PySimpleGUI as sg
 
+def checkingLink(StatusLink):
+    link = navegador.current_url
+    contador = 0
+    if(StatusLink == 'relacaoMudanca'):
+        urlConf = "http://admin.boltcard.com.br/pos/cadastro/listar"
+        if(link == urlConf):
+            print('\n\nLink esta correto!!!\n\n')
+        else:
+            yzb = True
+            while( yzb == True):
+                contador = 1 + contador
+                print('\n\nObtendo link correto',contador,'\n\n')
+                navegador.get(urlConf)
+                link = navegador.current_url
+                if(contador > 3 ):
+                    navegador.close()
+                    os.system('cls')
+                    yzb = False
+                    print("Provavelmente o sistema Administrativo de POS esta offline, o programa será encerrado")
+                    quit()
+                elif( link == urlConf):
+                    os.system('cls')
+                    yzb = False
+                    print("\n\nSistema estabilizado\n\n")
+    elif(StatusLink == 'relacaoConferencia'):
+        urlConf = "http://admin.boltcard.com.br/pos/movimento/listar"
+        if(link == urlConf):
+            print('\n\nLink esta correto!!!\n\n')
+        else:
+            yzb = True
+            while( yzb == True):
+                contador = 1 + contador
+                print('\n\nObtendo link correto',contador,'\n\n')
+                navegador.get(urlConf)
+                link = navegador.current_url
+                if(contador > 3 ):
+                    navegador.close()
+                    os.system('cls')
+                    yzb = False
+                    print("Provavelmente o sistema Administrativo de POS esta offline, o programa será encerrado")
+                    quit()
+                elif( link == urlConf):
+                    os.system('cls')
+                    yzb = False
+                    print("\n\nSistema estabilizado\n\n")
+    # elif(StatusLink == 'PosMudanca'):
 
 def conferencia(config):
     url = "http://admin.boltcard.com.br/pos/movimento/listar"
@@ -30,12 +79,12 @@ def conferencia(config):
                 print("Status: ", conf, " Numero de serie: ", linha)
             elif conf == '':
                 print("\n\n Não exite numero de serie")
-                break
+                quit()
             else:
                 print(
                     "\n\n\n\nContém pos em status configurado\nEquipamento esta configurado:", linha, "\n\n\n\n")
                 navegador.close()
-                break
+                quit()
             navegador.find_element_by_xpath(
                 '//*[@id="dataTable_filter"]/label/input').clear()
 
@@ -81,8 +130,7 @@ def conferenciaE():
 def loginAdmin():
     url = "http://admin.boltcard.com.br/login"
     navegador.get(url)
-    navegador.find_element_by_xpath(
-        '/html/body/div[2]/div[2]/form/div[1]/input').click()
+    navegador.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[1]/input').click()
     pyperclip.copy(log)
     pyautogui.hotkey("ctrl", "v")
     pyautogui.hotkey("Tab")
@@ -101,7 +149,13 @@ def mudanca():
     for linha in range(qtdlinha):
         #------------------------#
         print("\n\n---mudando:", linha, "de ", qtdlinha, "---\n\n")
-        navegador.get("http://admin.boltcard.com.br/pos/cadastro/listar")
+        url = "http://admin.boltcard.com.br/pos/cadastro/listar"
+        navegador.get(url)
+        print('\n\n\npassou pelo get\n\n\n')
+
+        checkingLink('relacaoMudanca')
+
+        print('\n\n\npassou pelo checking\n\n\n')
         navegador.find_element_by_xpath(
             '//*[@id="dataTable_filter"]/label/input').click()
         pyperclip.copy(colunaSerial[linha])
@@ -128,6 +182,9 @@ def insecao():
     loginAdmin()
     conferencia("insecao")
     for a in range(qtdlinha):
+        resultadoPorcentagem = (100*a)/qtdlinha
+        os.system('cls')
+        print("\n\n\nEm processo: ",resultadoPorcentagem,"%\n\n\n")
         navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').click()
         pyperclip.copy(colunaSerial[a])
         pyautogui.hotkey("ctrl", "v")
@@ -162,21 +219,38 @@ def insecao():
         for p in status:
             pyautogui.hotkey(p)
         navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[2]/form/div[2]/button').click()
-        os.system('cls')
-
-        resultadoPorcentagem = (100*a)/qtdlinha
-        print("\n\n\nEm processo: ",resultadoPorcentagem,"%\n\n\n")
         url = "http://admin.boltcard.com.br/pos/movimento/listar"
         navegador.get(url)
     navegador.close()    
     print("\n\n finalizado \n\n")    
 
+
+
+
+
 #---principal---#
+
+sg.theme('Dark') 
+layout = [  [sg.Text('Login:'), sg.InputText()],
+            [sg.Text('Senha:'), sg.InputText()],
+            [sg.Button('Entrar'), sg.Button('Cancelar Programa')] ]
+window = sg.Window('Login no Bolt Administrativo', layout)
+
+event, values = window.read()
+if event == sg.WIN_CLOSED or event == 'Cancelar Programa': 
+    window.close()
+    sg.popup('Programa encerrando:')
+    sg.popup('tchau...')
+    window.close()
+    quit()
+    
+window.close()
 # log = input("Login com permissão: ")
 # senha = input("senha: ")
+log = values[0]
+senha = values[1]
 fechar = True
-log = "douglas m"
-senha = 'tibolt2022'
+
 while fechar == True:
     cont = 0
     opcao = int(
@@ -189,7 +263,6 @@ while fechar == True:
         qtdlinha = tabela['Serial'].count()
         navegador = webdriver.Chrome()
         mudanca()
-
     elif(opcao == 2):
         print("registrar")
         fechar = False
@@ -208,6 +281,4 @@ while fechar == True:
         insecao()
     else:
         fechar = False
-
-
 print("\n\n\n\n\n\n------------------------Finalizando sistma---------------------------\n\n\n\n\n\n")
