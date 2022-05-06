@@ -146,6 +146,7 @@ def mudanca():
     time.sleep(2)
     contd = 0
     for linha in range(qtdlinha):
+        sg.one_line_progress_meter('Em Processo', linha+1, qtdlinha, 'Em Processo','Aguarde a execução')
         #------------------------#
         print("\n\n---mudando:", linha, "de ", qtdlinha, "---\n\n")
         url = "http://admin.boltcard.com.br/pos/cadastro/listar"
@@ -168,7 +169,7 @@ def mudanca():
         for es in colunaEstoque[linha]:
             pyautogui.hotkey(es)
         navegador.find_element_by_xpath('//*[@id="submeter"]').click()
-        sg.one_line_progress_meter('Em Processo', linha+1, qtdlinha, 'Em Processo','Aguarde a execução')
+        
 
     print("processo finalizado\nAguarde...")
     time.sleep(2)
