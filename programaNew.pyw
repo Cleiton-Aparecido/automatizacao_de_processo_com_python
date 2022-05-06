@@ -1,5 +1,4 @@
 from __future__ import barry_as_FLUFL
-import PySimpleGUI as sg
 from ast import Break
 from sqlite3 import Time
 import pyautogui
@@ -12,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import os
+import PySimpleGUI as sg
 
 def checkingLink(StatusLink):
     link = navegador.current_url
@@ -64,7 +64,6 @@ def conferencia(config):
     url = "http://admin.boltcard.com.br/pos/movimento/listar"
     navegador.get(url)
     resultadoConf = []
-    
     if(config == "mudanca"):
         print("\n\n__Iniciando conferencia para mudanca__\n\n")
         for linha in colunaSerial:
@@ -152,8 +151,8 @@ def mudanca():
         url = "http://admin.boltcard.com.br/pos/cadastro/listar"
         navegador.get(url)
         print('\n\n\npassou pelo get\n\n\n')
-        checkingLink('relacaoMudanca')
-        print('\n\n\npassou pelo checking\n\n\n')
+        # checkingLink('relacaoMudanca')
+        # print('\n\n\npassou pelo checking\n\n\n')
         navegador.find_element_by_xpath(
             '//*[@id="dataTable_filter"]/label/input').click()
         pyperclip.copy(colunaSerial[linha])
@@ -169,6 +168,8 @@ def mudanca():
         for es in colunaEstoque[linha]:
             pyautogui.hotkey(es)
         navegador.find_element_by_xpath('//*[@id="submeter"]').click()
+        sg.one_line_progress_meter('Em Processo', linha+1, qtdlinha, 'Em Processo','Aguarde a execução')
+
     print("processo finalizado\nAguarde...")
     time.sleep(2)
     os.system('cls')
@@ -180,6 +181,7 @@ def insecao():
     loginAdmin()
     conferencia("insecao")
     for a in range(qtdlinha):
+        sg.one_line_progress_meter('My Meter', a+1, qtdlinha, 'key','Optional message')
         resultadoPorcentagem = (100*a)/qtdlinha
         os.system('cls')
         print("\n\n\nEm processo: ",resultadoPorcentagem,"%\n\n\n")
@@ -222,40 +224,75 @@ def insecao():
     navegador.close()    
     print("\n\n finalizado \n\n")    
 
-#---principal---#
-log = input("Login com permissão: ")
-senha = input("senha: ")
 
+
+
+
+#---principal---#
+sg.theme('Dark') 
+layout = [  [sg.Text('Login:'), sg.InputText()],
+            [sg.Text('Senha:'), sg.InputText(password_char='*')],
+            [sg.Submit('Entrar'), sg.Button('Cancelar Programa')] ]
+window = sg.Window('Login no Bolt Administrativo', layout)
+
+event, values = window.read()
+if event == sg.WIN_CLOSED or event == 'Cancelar Programa': 
+    window.close()
+    sg.popup('Programa encerrado')
+    window.close()
+    quit()
+    
+window.close()
+
+log = values[0]
+senha = values[1]
 fechar = True
+print = sg.Print
 
 while fechar == True:
-    cont = 0
-    opcao = int(
-        input('\n1 - mudança\n2 - registrar\n3 - finalizar\n4 - alterar isenção\n\n'))
-    # opcao = 4
-    if(opcao == 1):
+    cont = 0   
+
+    layout_menu =  [[sg.Text('\n1 - Mudança\n2 - Registrar\n3 - Alterar isenção\n0 - Finalizar')],
+    [
+    sg.Radio(1, "RADIO1",key='Mudanca'),
+    sg.Radio(2, "RADIO1",key='Registrar'),
+    sg.Radio(3, "RADIO1",key='Alterar isenção'),
+    sg.Radio(0, "RADIO1",key='Finalizar')],
+    [sg.Submit('Processeguir')]
+    ]  
+    window_menu = sg.Window('Login no Bolt Administrativo', layout_menu)
+    event, values = window_menu.read()
+    window_menu.close()
+    if(values['Mudanca'] == True):
         tabela = pd.read_excel('mudanca.xlsx')
         colunaSerial = tabela['Serial']
         colunaEstoque = tabela['Estoque']
         qtdlinha = tabela['Serial'].count()
         navegador = webdriver.Chrome()
         mudanca()
-    elif(opcao == 2):
+    elif(values['Registrar'] == True):
         print("registrar")
         fechar = False
-    elif(opcao == 4):
+    elif(values['Alterar isenção'] == True):
         tabela = pd.read_excel('isencao.xlsx')
         colunaSerial = tabela['Serial']
         colunaPdv = tabela['pdv']
         colunaValor = tabela['valor']
         qtdlinha = tabela['Serial'].count()
-        print("_______configurações da inseção_______\n")
-        x = str(input("Data de inseção:"))
-        # x = "01/05/2999"
-        print("Data de inseção:",x,"\n\nTipo: ",type(x))
+        layoutIsencaoP2 = [[sg.Text('Data da isenção:'),sg.InputText(key='DataIsencao')],
+                            [sg.Submit('Processeguir')]]
+        WindowLayoutIsencao = sg.Window('Escolha a data de isenção',layoutIsencaoP2)
+        evento,valor = WindowLayoutIsencao.read()
         navegador = webdriver.Chrome()
         navegadorPOS = navegador
         insecao()
+    elif(values['Finalizar'] == True):
+        fechar = False
+        sg.popup('Programa encerrado')
+        quit()
+
     else:
         fechar = False
+        sg.popup('Programa encerrado')
+        
 print("\n\n\n\n\n\n------------------------Finalizando sistma---------------------------\n\n\n\n\n\n")
