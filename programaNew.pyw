@@ -61,8 +61,12 @@ def checkingLink(StatusLink):
     # elif(StatusLink == 'PosMudanca'):
 
 def conferencia(config):
+    confurl = navegador.current_url
     url = "http://admin.boltcard.com.br/pos/movimento/listar"
-    navegador.get(url)
+    if(confurl != url):
+        navegador.get(url)
+    elif(confurl == url):
+        print("link Ok")
     resultadoConf = []
     if(config == "mudanca"):
         print("\n\n__Iniciando conferencia para mudanca__\n\n")
@@ -110,8 +114,6 @@ def conferencia(config):
             for i in range(len(resultadoConf)):
                 print("O equipamento: ", resultadoConf[i],"Esta atrelado com o PDV divergente da planilha")
         
-        
-
 def conferenciaE():
     cont = 0
     print("\n\n__Iniciando conferencia estoque__\n\n")
@@ -125,7 +127,6 @@ def conferenciaE():
         print("\n\n\nStatus: ", local, " Numero de serie: ", linha, "\n\n\n")
         navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').clear()
 
-
 def loginAdmin():
     url = "http://admin.boltcard.com.br/login"
     navegador.get(url)
@@ -137,16 +138,14 @@ def loginAdmin():
     pyautogui.hotkey("ctrl", "v")
     pyautogui.hotkey("Enter")
     time.sleep(2)
-   
-
-
+ 
 def mudanca():
     loginAdmin()
     conferencia("mudanca")
     time.sleep(2)
     contd = 0
     for linha in range(qtdlinha):
-        sg.one_line_progress_meter('Em Processo', linha+1, qtdlinha, 'Em Processo','Aguarde a execução')
+        # sg.one_line_progress_meter('Em Processo', linha+1, qtdlinha, 'Em Processo','Aguarde a execução')
         #------------------------#
         print("\n\n---mudando:", linha, "de ", qtdlinha, "---\n\n")
         url = "http://admin.boltcard.com.br/pos/cadastro/listar"

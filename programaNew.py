@@ -274,7 +274,7 @@ while fechar == True:
         qtdlinha = tabela['Serial'].count()
         print("_______configurações da inseção_______\n")
         x = str(input("Data de inseção:"))
-        # x = "01/05/2999"
+      
         print("Data de inseção:",x,"\n\nTipo: ",type(x))
         navegador = webdriver.Chrome()
         navegadorPOS = navegador
