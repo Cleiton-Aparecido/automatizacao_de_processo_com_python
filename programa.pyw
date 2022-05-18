@@ -186,7 +186,6 @@ def mudanca():
         for es in colunaEstoque[linha]:
             pyautogui.hotkey(es)
         navegador.find_element_by_xpath('//*[@id="submeter"]').click()
-
     print("processo finalizado\nAguarde...")
     time.sleep(2)
     os.system('cls')
@@ -294,7 +293,7 @@ while fechar == True:
         colunaSerial = tabela['Serial']
         colunaEstoque = tabela['Estoque']
         qtdlinha = tabela['Serial'].count()
-        navegador = webdriver.Chrome()
+        navegador =webdriver.Chrome(executable_path=r'./chromedriver.exe')
         mudanca()
     elif(values['Registrar'] == True):
         print("registrar")
@@ -310,7 +309,7 @@ while fechar == True:
         WindowLayoutIsencao = sg.Window(
             'Escolha a data de isenção', layoutIsencaoP2)
         evento, valor = WindowLayoutIsencao.read()
-        navegador = webdriver.Chrome()
+        navegador =webdriver.Chrome(executable_path=r'./chromedriver.exe')
         navegadorPOS = navegador
         insecao()
     elif(values['Finalizar'] == True):
