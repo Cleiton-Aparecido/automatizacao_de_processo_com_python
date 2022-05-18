@@ -1,16 +1,14 @@
-import PySimpleGUI as sg
+import pyautogui
+import pyperclip
+import pandas as pd
 import time
+from selenium import webdriver
 
-sg.theme('Dark')
-# layout = [
-#             sg.PopupAnimated('Ajux_loader.gif')
-#          ]
-# window = sg.Window('To Do List Example', layout)
-# event, values = window.read()
 
-for i in range(100000):
-    sg.PopupAnimated(sg.DEFAULT_BASE64_LOADING_GIF,background_color='white', time_between_frames=100)
 
-sg.PopupAnimated(None)  
+navegador = webdriver.Chrome()
+navegador.get("http://192.168.0.241/pos/indexDev.php")
+org = navegador.find_element_by_xpath('//*[@id="salva_devolu"]/a[3]')
 
-sg.PopupAnimated(None).close()
+
+print("\n\n\nLink:",org.get_attribute("href"),"\n\n")

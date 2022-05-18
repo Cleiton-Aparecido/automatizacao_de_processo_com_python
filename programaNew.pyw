@@ -1,6 +1,6 @@
-from __future__ import barry_as_FLUFL
-from ast import Break
-from sqlite3 import Time
+# from __future__ import barry_as_FLUFL
+# from ast import Break
+# import os
 import pyautogui
 import pyperclip
 import pandas as pd
@@ -10,8 +10,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
-import os
 import PySimpleGUI as sg
+print = sg.Print
 
 def checkingLink(StatusLink):
     link = navegador.current_url
@@ -22,18 +22,19 @@ def checkingLink(StatusLink):
             print('\n\nLink esta correto!!!\n\n')
         else:
             yzb = True
-            while( yzb == True):
+            while(yzb == True):
                 contador = 1 + contador
-                print('\n\nObtendo link correto',contador,'\n\n')
+                print('\n\nObtendo link correto', contador, '\n\n')
                 navegador.get(urlConf)
                 link = navegador.current_url
-                if(contador > 3 ):
+                if(contador > 3):
                     navegador.close()
                     os.system('cls')
                     yzb = False
-                    print("Provavelmente o sistema Administrativo de POS esta offline, o programa será encerrado")
+                    print(
+                        "Provavelmente o sistema Administrativo de POS esta offline, o programa será encerrado")
                     quit()
-                elif( link == urlConf):
+                elif(link == urlConf):
                     os.system('cls')
                     yzb = False
                     print("\n\nSistema estabilizado\n\n")
@@ -43,18 +44,19 @@ def checkingLink(StatusLink):
             print('\n\nLink esta correto!!!\n\n')
         else:
             yzb = True
-            while( yzb == True):
+            while(yzb == True):
                 contador = 1 + contador
-                print('\n\nObtendo link correto',contador,'\n\n')
+                print('\n\nObtendo link correto', contador, '\n\n')
                 navegador.get(urlConf)
                 link = navegador.current_url
-                if(contador > 3 ):
+                if(contador > 3):
                     navegador.close()
                     os.system('cls')
                     yzb = False
-                    print("Provavelmente o sistema Administrativo de POS esta offline, o programa será encerrado")
+                    print(
+                        "Provavelmente o sistema Administrativo de POS esta offline, o programa será encerrado")
                     quit()
-                elif( link == urlConf):
+                elif(link == urlConf):
                     os.system('cls')
                     yzb = False
                     print("\n\nSistema estabilizado\n\n")
@@ -94,65 +96,81 @@ def conferencia(config):
     if(config == "insecao"):
         print("\n\n__Iniciando conferencia para alterar isenção__\n\n")
         for cont in range(qtdlinha):
-            navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').click()
+            navegador.find_element_by_xpath(
+                '//*[@id="dataTable_filter"]/label/input').click()
             pyperclip.copy(colunaSerial[cont])
             pyautogui.hotkey("ctrl", "v")
-            conf = navegador.find_element_by_xpath('//*[@id="dataTable"]/tbody/tr/td[11]').text
+            conf = navegador.find_element_by_xpath(
+                '//*[@id="dataTable"]/tbody/tr/td[11]').text
             colunaPdv[cont] = str(colunaPdv[cont])
             while(len(colunaPdv[cont]) < 6):
                 colunaPdv[cont] = "0" + colunaPdv[cont]
-            if(conf ==  colunaPdv[cont]):
-                print("\n\nPDV esta correto com o sistema:",colunaPdv[cont],"\n\n")
+            if(conf == colunaPdv[cont]):
+                print("\n\nPDV esta correto com o sistema:",
+                      colunaPdv[cont], "\n\n")
             elif(conf != colunaPdv[cont]):
-                resultadoConf.append(colunaSerial[cont]) 
-            navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').clear()
-        if(len( resultadoConf) == 0 ):
+                resultadoConf.append(colunaSerial[cont])
+            navegador.find_element_by_xpath(
+                '//*[@id="dataTable_filter"]/label/input').clear()
+        if(len(resultadoConf) == 0):
             print("Estão todas certas\n")
         else:
             navegador.close()
             os.system('cls')
             for i in range(len(resultadoConf)):
-                print("O equipamento: ", resultadoConf[i],"Esta atrelado com o PDV divergente da planilha")
-        
+                print("O equipamento: ",
+                      resultadoConf[i], "Esta atrelado com o PDV divergente da planilha")
+
+
 def conferenciaE():
     cont = 0
     print("\n\n__Iniciando conferencia estoque__\n\n")
     navegador.get("http://admin.boltcard.com.br/pos/movimento/listar")
+    cont = 0
     for linha in colunaSerial:
-        navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').click()
+        navegador.find_element_by_xpath(
+            '//*[@id="dataTable_filter"]/label/input').click()
         pyperclip.copy(linha)
         pyautogui.hotkey("ctrl", "v")
-        local = navegador.find_element_by_xpath('//*[@id="dataTable"]/tbody/tr/td[7]').text
+        local = navegador.find_element_by_xpath(
+            '//*[@id="dataTable"]/tbody/tr/td[7]').text
         time.sleep(0.2)
-        print("\n\n\nStatus: ", local, " Numero de serie: ", linha, "\n\n\n")
-        navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').clear()
+        print("\n\n\nEstoque pretentede: ",
+              colunaEstoque[cont], "Estoque atual: ", local, " Numero de serie: ", linha, "\n\n\n")
+        cont += 1
+        navegador.find_element_by_xpath(
+            '//*[@id="dataTable_filter"]/label/input').clear()
+
 
 def loginAdmin():
     url = "http://admin.boltcard.com.br/login"
     navegador.get(url)
-    navegador.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[1]/input').click()
+    navegador.find_element_by_xpath(
+        '/html/body/div[2]/div[2]/form/div[1]/input').click()
     pyperclip.copy(log)
     pyautogui.hotkey("ctrl", "v")
     pyautogui.hotkey("Tab")
     pyperclip.copy(senha)
     pyautogui.hotkey("ctrl", "v")
     pyautogui.hotkey("Enter")
+    pyautogui.hotkey('Win', 'Up')
     time.sleep(2)
- 
+
+
 def mudanca():
     loginAdmin()
+    print("Aguarde... Sistema Carregando...")
     conferencia("mudanca")
     time.sleep(2)
     contd = 0
     for linha in range(qtdlinha):
         # sg.one_line_progress_meter('Em Processo', linha+1, qtdlinha, 'Em Processo','Aguarde a execução')
         #------------------------#
-        print("\n\n---mudando:", linha, "de ", qtdlinha, "---\n\n")
+        print("\n\n---mudando:", linha, "de ", qtdlinha, "---\n\nMudando:",
+              colunaSerial[linha], " Para: ", colunaEstoque[linha], "\n\n")
         url = "http://admin.boltcard.com.br/pos/cadastro/listar"
         navegador.get(url)
         print('\n\n\npassou pelo get\n\n\n')
-        # checkingLink('relacaoMudanca')
-        # print('\n\n\npassou pelo checking\n\n\n')
         navegador.find_element_by_xpath(
             '//*[@id="dataTable_filter"]/label/input').click()
         pyperclip.copy(colunaSerial[linha])
@@ -168,7 +186,6 @@ def mudanca():
         for es in colunaEstoque[linha]:
             pyautogui.hotkey(es)
         navegador.find_element_by_xpath('//*[@id="submeter"]').click()
-        
 
     print("processo finalizado\nAguarde...")
     time.sleep(2)
@@ -181,85 +198,94 @@ def insecao():
     loginAdmin()
     conferencia("insecao")
     for a in range(qtdlinha):
-        sg.one_line_progress_meter('My Meter', a+1, qtdlinha, 'key','Optional message')
+        sg.one_line_progress_meter(
+            'My Meter', a+1, qtdlinha, 'key', 'Optional message')
         resultadoPorcentagem = (100*a)/qtdlinha
         os.system('cls')
-        print("\n\n\nEm processo: ",resultadoPorcentagem,"%\n\n\n")
-        navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').click()
+        print("\n\n\nEm processo: ", resultadoPorcentagem, "%\n\n\n")
+        navegador.find_element_by_xpath(
+            '//*[@id="dataTable_filter"]/label/input').click()
         pyperclip.copy(colunaSerial[a])
         pyautogui.hotkey("ctrl", "v")
-        navegador.find_element_by_xpath('//*[@id="dataTable"]/tbody/tr/td[12]/a').click()
+        navegador.find_element_by_xpath(
+            '//*[@id="dataTable"]/tbody/tr/td[12]/a').click()
         navegador.get(navegador.current_url)
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[1]/div/div/button').click()
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[1]/div/div/button').click()
         time.sleep(1)
-        navegador.find_element_by_xpath('//*[@id="dar_baixa_pos"]/div/div/form/div[2]/button[2]').click()
+        navegador.find_element_by_xpath(
+            '//*[@id="dar_baixa_pos"]/div/div/form/div[2]/button[2]').click()
         time.sleep(1)
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div[2]/div[2]/div/div[1]/div/div/button').click()
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div[2]/div[2]/div/div[1]/div/div/button').click()
         time.sleep(2)
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[1]/div/div[1]/input').click()  
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[1]/div/div[1]/input').click()
         pyperclip.copy(colunaPdv[a])
         pyautogui.hotkey("ctrl", "v")
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[3]/input').clear()  
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[3]/input').click()
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[3]/input').clear()
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[3]/input').click()
         colunaValor[a] = str(colunaValor[a])
         colunaValor[a] = colunaValor[a] + "0"
         pyperclip.copy(colunaValor[a])
         pyautogui.hotkey("ctrl", "v")
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/input').clear()  
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/input').click()
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/input').clear()
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/input').click()
         pyperclip.copy(x)
         pyautogui.hotkey("ctrl", "v")
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[2]/button[2]').click()
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[2]/button[2]').click()
         # mudando para configurado
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[2]/div/div/a').click()
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[2]/div/div/a').click()
         url = navegador.current_url
         navegador.get(url)
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[2]/form/div[1]/div[1]/div[3]/select').click()
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[2]/form/div[1]/div[1]/div[3]/select').click()
         status = 'configuraco'
         for p in status:
             pyautogui.hotkey(p)
-        navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[2]/form/div[2]/button').click()
+        navegador.find_element_by_xpath(
+            '/html/body/div[2]/div[2]/main/div[2]/form/div[2]/button').click()
         url = "http://admin.boltcard.com.br/pos/movimento/listar"
         navegador.get(url)
-    navegador.close()    
-    print("\n\n finalizado \n\n")    
-
-
-
+    navegador.close()
+    print("\n\n finalizado \n\n")
 
 
 #---principal---#
-sg.theme('Dark') 
-layout = [  [sg.Text('Login:'), sg.InputText()],
-            [sg.Text('Senha:'), sg.InputText(password_char='*')],
-            [sg.Submit('Entrar'), sg.Button('Cancelar Programa')] ]
+sg.theme('Dark')
+layout = [[sg.Text('Login:'), sg.InputText()],
+          [sg.Text('Senha:'), sg.InputText(password_char='*')],
+          [sg.Submit('Entrar'), sg.Button('Cancelar Programa')]]
 window = sg.Window('Login no Bolt Administrativo', layout)
 
 event, values = window.read()
-if event == sg.WIN_CLOSED or event == 'Cancelar Programa': 
+if event == sg.WIN_CLOSED or event == 'Cancelar Programa':
     window.close()
     sg.popup('Programa encerrado')
     window.close()
     quit()
-    
-window.close()
 
+window.close()
 log = values[0]
 senha = values[1]
 fechar = True
-print = sg.Print
 
 while fechar == True:
-    cont = 0   
-
-    layout_menu =  [[sg.Text('\n1 - Mudança\n2 - Registrar\n3 - Alterar isenção\n0 - Finalizar')],
-    [
-    sg.Radio(1, "RADIO1",key='Mudanca'),
-    sg.Radio(2, "RADIO1",key='Registrar'),
-    sg.Radio(3, "RADIO1",key='Alterar isenção'),
-    sg.Radio(0, "RADIO1",key='Finalizar')],
-    [sg.Submit('Processeguir')]
-    ]  
+    cont = 0
+    layout_menu = [[sg.Text('\n1 - Mudança\n2 - Registrar\n3 - Alterar isenção\n0 - Finalizar')],
+                   [
+        sg.Radio(1, "RADIO1", key='Mudanca'),
+        sg.Radio(2, "RADIO1", key='Registrar POS no sistema'),
+        sg.Radio(3, "RADIO1", key='Alterar isenção'),
+        sg.Radio(0, "RADIO1", key='Finalizar')],
+        [sg.Submit('Processeguir')]
+    ]
     window_menu = sg.Window('Login no Bolt Administrativo', layout_menu)
     event, values = window_menu.read()
     window_menu.close()
@@ -279,10 +305,11 @@ while fechar == True:
         colunaPdv = tabela['pdv']
         colunaValor = tabela['valor']
         qtdlinha = tabela['Serial'].count()
-        layoutIsencaoP2 = [[sg.Text('Data da isenção:'),sg.InputText(key='DataIsencao')],
-                            [sg.Submit('Processeguir')]]
-        WindowLayoutIsencao = sg.Window('Escolha a data de isenção',layoutIsencaoP2)
-        evento,valor = WindowLayoutIsencao.read()
+        layoutIsencaoP2 = [[sg.Text('Data da isenção:'), sg.InputText(key='DataIsencao')],
+                           [sg.Submit('Processeguir')]]
+        WindowLayoutIsencao = sg.Window(
+            'Escolha a data de isenção', layoutIsencaoP2)
+        evento, valor = WindowLayoutIsencao.read()
         navegador = webdriver.Chrome()
         navegadorPOS = navegador
         insecao()
@@ -294,5 +321,4 @@ while fechar == True:
     else:
         fechar = False
         sg.popup('Programa encerrado')
-        
-print("\n\n\n\n\n\n------------------------Finalizando sistma---------------------------\n\n\n\n\n\n")
+
