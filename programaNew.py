@@ -11,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import PySimpleGUI as sg
+
 print = sg.Print
 
 def checkingLink(StatusLink):
@@ -184,7 +185,7 @@ def mudanca():
         print(urlAux)
         pyautogui.hotkey("ctrl", "t")
         time.sleep(1)
-        navegadorPOS = webdriver.Chrome()
+        navegadorPOS = webdriver.Chrome(executable_path=r'./chromedriver.exe')
         navegadorPOS.get(urlAux)
 
         
@@ -304,7 +305,7 @@ if __name__ == "__main__":
             colunaSerial = tabela['Serial']
             colunaEstoque = tabela['Estoque']
             qtdlinha = tabela['Serial'].count()
-            navegador = webdriver.Chrome()
+            navegador = webdriver.Chrome(executable_path=r'./chromedriver.exe')
             navegadorPOS = navegador
             mudanca()
         elif(values['Registrar'] == True):
@@ -321,7 +322,7 @@ if __name__ == "__main__":
             WindowLayoutIsencao = sg.Window(
                 'Escolha a data de isenção', layoutIsencaoP2)
             evento, valor = WindowLayoutIsencao.read()
-            navegador = webdriver.Chrome()
+            navegador = webdriver.Chrome(executable_path=r'./chromedriver.exe')
             navegadorPOS = navegador
             insecao()
         elif(values['Finalizar'] == True):
