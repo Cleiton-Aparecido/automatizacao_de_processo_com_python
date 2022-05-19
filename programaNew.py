@@ -10,6 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.keys import Keys
 import PySimpleGUI as sg
 
 print = sg.Print
@@ -75,12 +76,10 @@ def conferencia(config):
     if(config == "mudanca"):
         print("\n\n__Iniciando conferencia para mudanca__\n\n")
         for linha in colunaSerial:
-            navegador.find_element_by_xpath(
-                '//*[@id="dataTable_filter"]/label/input').click()
-            pyautogui.typewrite(linha)
-            conf = navegador.find_element_by_xpath(
-                '//*[@id="dataTable"]/tbody/tr/td[6]').text
-            time.sleep(0.2)
+            navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').send_keys(linha)
+
+            conf = navegador.find_element_by_xpath('//*[@id="dataTable"]/tbody/tr/td[6]').text
+            # time.sleep(0.2)
             if conf == 'ESTOQUE':
                 print("Status: ", conf, " Numero de serie: ", linha)
             elif conf == '':
@@ -143,53 +142,35 @@ def conferenciaE():
             '//*[@id="dataTable_filter"]/label/input').clear()
 
 
-def loginAdmin():
+def loginAdmin(startlogin):
     url = "http://admin.boltcard.com.br/login"
-    navegador.get(url)
-    navegador.find_element_by_xpath(
-        '/html/body/div[2]/div[2]/form/div[1]/input').click()
-    pyperclip.copy(log)
-    pyautogui.hotkey("ctrl", "v")
-    pyautogui.hotkey("Tab")
-    pyperclip.copy(senha)
-    pyautogui.hotkey("ctrl", "v")
-    pyautogui.hotkey("Enter")
-    pyautogui.hotkey('Win', 'Up')
+    startlogin.get(url)
+    startlogin.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[1]/input').send_keys(log)
+    startlogin.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[2]/input').send_keys(senha)
+    startlogin.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[3]/div/div[2]/button').click()   
+    startlogin.maximize_window()
     time.sleep(2)
 
 
 def mudanca():
-    loginAdmin()
+    navegadorPOS = webdriver.Chrome(executable_path=r'./chromedriver.exe')
+    loginAdmin(navegadorPOS)
+    time.sleep(2)
+    loginAdmin(navegador)
     print("Aguarde... Sistema Carregando...")
-    # conferencia("mudanca")
+    conferencia("mudanca")
     time.sleep(2)
     for linha in range(qtdlinha):
-        # sg.one_line_progress_meter('Em Processo', linha+1, qtdlinha, 'Em Processo','Aguarde a execução')
         #------------------------#
         print("\n\n---mudando:", linha, "de ", qtdlinha, "---\n\nMudando:",
               colunaSerial[linha], " Para: ", colunaEstoque[linha], "\n\n")
         checkingLink('relacaoMudanca')
-        print('\n\n\npassou pelo get\n\n\n')
-        navegador.find_element_by_xpath(
-            '//*[@id="dataTable_filter"]/label/input').click()
-        time.sleep(0.2)
-        pyautogui.typewrite(colunaSerial[linha])
-        time.sleep(0.1)
-
-
-        # navegador.find_element_by_xpath(
-        #     '//*[@id="dataTable"]/tbody/tr/td[8]/a[1]').click()
-
-        urlAux = navegador.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[2]/div[2]/div/div/div/table/tbody/tr/td[8]/a[1]').get_attribute("href")
-
-        print(urlAux)
-        pyautogui.hotkey("ctrl", "t")
-        time.sleep(1)
-        navegadorPOS = webdriver.Chrome(executable_path=r'./chromedriver.exe')
-        navegadorPOS.get(urlAux)
+        navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').send_keys(colunaSerial[linha])
+        time.sleep(0.3)
+      
 
         
-        time.sleep(5) 
+        time.sleep(10) 
         quit()
         navegador.find_element_by_xpath(
             '//*[@id="form_pos"]/div[1]/div[1]/div[6]/select').click()
@@ -306,7 +287,7 @@ if __name__ == "__main__":
             colunaEstoque = tabela['Estoque']
             qtdlinha = tabela['Serial'].count()
             navegador = webdriver.Chrome(executable_path=r'./chromedriver.exe')
-            navegadorPOS = navegador
+            
             mudanca()
         elif(values['Registrar'] == True):
             print("registrar")
@@ -323,7 +304,6 @@ if __name__ == "__main__":
                 'Escolha a data de isenção', layoutIsencaoP2)
             evento, valor = WindowLayoutIsencao.read()
             navegador = webdriver.Chrome(executable_path=r'./chromedriver.exe')
-            navegadorPOS = navegador
             insecao()
         elif(values['Finalizar'] == True):
             fechar = False

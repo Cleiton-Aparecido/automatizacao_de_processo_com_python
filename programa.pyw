@@ -145,15 +145,12 @@ def conferenciaE():
 def loginAdmin():
     url = "http://admin.boltcard.com.br/login"
     navegador.get(url)
-    navegador.find_element_by_xpath(
-        '/html/body/div[2]/div[2]/form/div[1]/input').click()
-    pyperclip.copy(log)
-    pyautogui.hotkey("ctrl", "v")
-    pyautogui.hotkey("Tab")
-    pyperclip.copy(senha)
-    pyautogui.hotkey("ctrl", "v")
-    pyautogui.hotkey("Enter")
-    pyautogui.hotkey('Win', 'Up')
+    navegador.maximize_window()
+    navegador.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[1]/input').click()
+    navegador.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[1]/input').send_keys(log)
+    navegador.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[2]/input').send_keys(senha)
+    navegador.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[3]/div/div[2]/button').click()   
+    navegador.maximize_window()
     time.sleep(2)
 
 
@@ -170,12 +167,12 @@ def mudanca():
               colunaSerial[linha], " Para: ", colunaEstoque[linha], "\n\n")
         url = "http://admin.boltcard.com.br/pos/cadastro/listar"
         navegador.get(url)
-        print('\n\n\npassou pelo get\n\n\n')
         navegador.find_element_by_xpath(
             '//*[@id="dataTable_filter"]/label/input').click()
-        pyperclip.copy(colunaSerial[linha])
+        # pyperclip.copy(colunaSerial[linha])
         time.sleep(0.2)
-        pyautogui.hotkey("ctrl", "v")
+        # pyautogui.hotkey("ctrl", "v")
+        navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').send_keys(colunaSerial[linha])
         time.sleep(0.1)
         navegador.find_element_by_xpath(
             '//*[@id="dataTable"]/tbody/tr/td[8]/a[1]').click()

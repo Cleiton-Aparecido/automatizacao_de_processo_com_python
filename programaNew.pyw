@@ -143,16 +143,11 @@ def conferenciaE():
 
 
 def loginAdmin():
-    url = "http://admin.boltcard.com.br/login"
+   url = "http://admin.boltcard.com.br/login"
     navegador.get(url)
-    navegador.find_element_by_xpath(
-        '/html/body/div[2]/div[2]/form/div[1]/input').click()
-    pyperclip.copy(log)
-    pyautogui.hotkey("ctrl", "v")
-    pyautogui.hotkey("Tab")
-    pyperclip.copy(senha)
-    pyautogui.hotkey("ctrl", "v")
-    pyautogui.hotkey("Enter")
+    navegador.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[1]/input').send_keys(log)
+    navegador.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[2]/input').send_keys(senha)
+    navegador.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[3]/div/div[2]/button').click()   
     pyautogui.hotkey('Win', 'Up')
     time.sleep(2)
 
