@@ -12,7 +12,7 @@ import PySimpleGUI as sg
 import re
 
 
-print = sg.Print
+# print = sg.Print
 
 
 def checkingLink(StatusLink):

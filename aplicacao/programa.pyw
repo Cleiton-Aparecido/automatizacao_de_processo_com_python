@@ -85,6 +85,7 @@ def conferencia(config):
                 quit()
             else:
                 print("\n\n\n\nContém pos em status configurado\nEquipamento esta configurado:", linha, "\n\n\n\n")
+                sg.popup('Contém máquina de cartão\natrelado em pdv errado')
                 navegador.close()
                 quit()
             navegador.find_element_by_xpath('//*[@id="dataTable_filter"]/label/input').clear()
@@ -130,8 +131,12 @@ def conferenciaEstoque():
 def loginAdmin(startlogin):
     url = "http://admin.boltcard.com.br/login"
     startlogin.get(url)
+    chegarxpath(startlogin,'/html/body/div[2]/div[2]/form/div[1]/input')
     startlogin.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[1]/input').send_keys(log)
+    chegarxpath(startlogin,'/html/body/div[2]/div[2]/form/div[2]/input')
     startlogin.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[2]/input').send_keys(senha)
+    chegarxpath(startlogin,'/html/body/div[2]/div[2]/form/div[3]/div/div[2]/button')
+    time.sleep(1)
     startlogin.find_element_by_xpath('/html/body/div[2]/div[2]/form/div[3]/div/div[2]/button').click()   
 
 
@@ -152,12 +157,13 @@ def mudanca():
         chegarxpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[2]/form/div[1]/div[1]/div[6]/select')
         navegadorPOS.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[2]/form/div[1]/div[1]/div[6]/select').send_keys(colunaEstoque[linha])
         chegarxpath(navegadorPOS,'//*[@id="submeter"]')
+        time.sleep(0.5)
         navegadorPOS.find_element_by_xpath('//*[@id="submeter"]').click()
-        # time.sleep(1)
     print("processo finalizado\nAguarde...")
     conferenciaEstoque()
     navegador.close()
     navegadorPOS.close()
+    os.system('taskkill /f /im chromedriver.exe')
 
 
 
@@ -175,6 +181,22 @@ def inverterString(dataDesformatada):
 
 
 def insecao():
+    layout = [[sg.Text('Data Isenção:'), sg.InputText()],
+            [sg.Submit('Entrar'), sg.Button('Cancelar Programa')]]
+    window = sg.Window('Data Isenção', layout)
+
+    event, values = window.read()
+
+    if event == sg.WIN_CLOSED or event == 'Cancelar Programa':
+        window.close()
+        sg.popup('Programa encerrado')
+        window.close()
+        quit()
+
+    window.close()
+    dataisencaomenu = values[0]
+   
+
     print("Aguarde... Sistema Carregando...\nAbrindo 1° chrome ")
     loginAdmin(navegadorPOS)
     print("\nAguarde... Sistema Carregando...\nAbrindo 2° chrome ")
@@ -212,8 +234,8 @@ def insecao():
             navegadorPOS.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[3]/input').send_keys(adcValor)
         chegarxpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/input')
         navegadorPOS.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/input').clear()
-        datastring = inverterString(dataIsencao[a])
-        for adcdata in datastring:
+        # datastring = inverterString(dataisencaomenu)
+        for adcdata in dataisencaomenu:
             navegadorPOS.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/input').send_keys(adcdata)
         chegarxpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[2]/button[2]')
         navegadorPOS.find_element_by_xpath('/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[2]/button[2]').click()
@@ -232,6 +254,7 @@ def insecao():
         
     navegador.close()
     navegadorPOS.close()
+    os.system('taskkill /f /im chromedriver.exe')
     print("\n\n finalizado \n\n")
 
 
@@ -287,7 +310,7 @@ if __name__ == "__main__":
             colunaSerial = tabela['Serial']
             colunaPdv = tabela['pdv']
             colunaValor = tabela['valor']
-            dataIsencao =  tabela['dataisencao']
+            # dataIsencao =  tabela['dataisencao']
             qtdlinha = tabela['Serial'].count()
             navegador = webdriver.Chrome(executable_path=r'./chromedriver.exe')
             navegadorPOS = webdriver.Chrome(executable_path=r'./chromedriver.exe')
