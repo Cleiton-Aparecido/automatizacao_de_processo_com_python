@@ -297,7 +297,7 @@ if __name__ == "__main__":
         event, values = window_menu.read()
         window_menu.close()
         if(values['Mudanca'] == True):
-            tabela = pd.read_excel('aplicacao/mudanca.xlsx')
+            tabela = pd.read_excel('mudanca.xlsx')
             colunaSerial = tabela['Serial']
             colunaEstoque = tabela['Estoque']
             qtdlinha = tabela['Serial'].count()
@@ -309,7 +309,7 @@ if __name__ == "__main__":
         elif(values['Registrar POS no sistema'] == True):
             sg.popup("registrar")
         elif(values['Alterar isenção'] == True):
-            tabela = pd.read_excel('aplicacao/isencao.xlsx')
+            tabela = pd.read_excel('isencao.xlsx')
             colunaSerial = tabela['Serial']
             colunaPdv = tabela['pdv']
             colunaValor = tabela['valor']
