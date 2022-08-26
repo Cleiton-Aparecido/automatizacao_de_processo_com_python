@@ -79,7 +79,7 @@ def conferencia(config):
         for linha in colunaSerial:
             cont += 1
             navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').send_keys(linha)
-            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[6]').text
+            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[3]').text
             if conf == 'ESTOQUE':
                 print("\n",cont," - Status: ", conf, " Numero de serie: ", linha)
             elif conf == '':
@@ -96,7 +96,8 @@ def conferencia(config):
         print("\n\n__Iniciando conferencia para alterar isenção__\n\n")
         for cont in range(qtdlinha):
             navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').send_keys(colunaSerial[cont])
-            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[11]').text
+            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[5]').text
+
             colunaPdv[cont] = str(colunaPdv[cont])
             while(len(colunaPdv[cont]) < 6):
                 colunaPdv[cont] = "0" + colunaPdv[cont]
@@ -148,6 +149,7 @@ def mudanca():
     print("Abrindo 2° chrome ")
     loginAdmin(navegadorPOS)
     conferencia("mudanca")
+
     for linha in range(qtdlinha):
         print("\n---mudando:", linha + 1, "de ", qtdlinha, "---\nMudando:",
               colunaSerial[linha], " Para: ", colunaEstoque[linha], "\n")
@@ -212,7 +214,7 @@ def insecao():
         checkingLink("insecao")
         navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').clear()
         navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').send_keys(colunaSerial[a])
-        urlaux =  navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div/div/div/table/tbody/tr/td[12]/a').get_attribute("href")
+        urlaux =  navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div/div/div/table/tbody/tr/td[6]/a').get_attribute("href")
         navegadorPOS.get(urlaux)
         chegarxpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[1]/div/div/button')
         navegadorPOS.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[1]/div/div/button').click()
