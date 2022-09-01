@@ -78,8 +78,10 @@ def conferencia(config):
         print("\n\n__Iniciando conferencia para mudanca__\n\n")
         for linha in colunaSerial:
             cont += 1
-            navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').send_keys(linha)
-            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[3]').text
+            navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').clear()
+            navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').send_keys(linha)
+            navegador.find_element(By.XPATH,'//*[@id="btn_enviar"]').click()
+            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[7]').text
             if conf == 'ESTOQUE':
                 print("\n",cont," - Status: ", conf, " Numero de serie: ", linha)
             elif conf == '':
@@ -90,13 +92,14 @@ def conferencia(config):
                 sg.popup('Contém máquina de cartão\natrelado em pdv errado')
                 navegador.close()
                 quit()
-            navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').clear()
 
     if(config == "insecao"):
         print("\n\n__Iniciando conferencia para alterar isenção__\n\n")
         for cont in range(qtdlinha):
-            navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').send_keys(colunaSerial[cont])
-            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[5]').text
+            navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').clear()
+            navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').send_keys(colunaSerial[cont])
+            navegador.find_element(By.XPATH,'//*[@id="btn_enviar"]').click()
+            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[11]').text
 
             colunaPdv[cont] = str(colunaPdv[cont])
             while(len(colunaPdv[cont]) < 6):
@@ -106,7 +109,7 @@ def conferencia(config):
                       colunaPdv[cont])
             elif(conf != colunaPdv[cont]):
                 resultadoConfserial.append(colunaSerial[cont])
-            navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').clear()
+            
         if(len(resultadoConfserial) == 0):
             print("Estão todas certas\n")
         else:
@@ -212,9 +215,14 @@ def insecao():
         resultadoPorcentagem = (100*a)/qtdlinha
         print("\nEm processo: ", resultadoPorcentagem, "%")
         checkingLink("insecao")
-        navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').clear()
-        navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').send_keys(colunaSerial[a])
-        urlaux =  navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div/div/div/table/tbody/tr/td[6]/a').get_attribute("href")
+
+        # buscar endereço para alteração
+        navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').clear()
+        navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').send_keys(colunaSerial[a])
+        navegador.find_element(By.XPATH,'//*[@id="btn_enviar"]').click()
+        urlaux =  navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[12]/a').get_attribute("href")
+        # Fim - buscar endereço para alteração
+
         navegadorPOS.get(urlaux)
         chegarxpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[1]/div/div/button')
         navegadorPOS.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[1]/div/div/button').click()
@@ -230,9 +238,13 @@ def insecao():
         colunaPdv[a] = str(colunaPdv[a])
         chegarxpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[1]/div/div[1]/input')
         navegadorPOS.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[1]/div/div[1]/input').send_keys(colunaPdv[a])
+
+        # formatar valor de isencao
         colunaValor[a] = str(colunaValor[a])
         colunaValor[a] = re.sub(r"[^a-zA-Z0-9]","",colunaValor[a])
         colunaValor[a] = colunaValor[a] + "0"
+        #  Fim - formatar valor de isencao
+
         chegarxpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[3]/input')
         navegadorPOS.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[3]/input').clear()
         for adcValor in colunaValor[a]:
@@ -255,8 +267,7 @@ def insecao():
         chegarxpath(navegadorPOS,'//*[@id="form_pos"]/div[1]/div[1]/div[3]/select')
         navegadorPOS.find_element(By.XPATH,'//*[@id="form_pos"]/div[1]/div[1]/div[3]/select').send_keys('CONFIGURADO')
         chegarxpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[2]/form/div[2]/button')
-        navegadorPOS.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/form/div[2]/button').click()
-        
+        navegadorPOS.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/form/div[2]/button').click()   
     navegador.close()
     navegadorPOS.close()
     os.system('taskkill /f /im chromedriver.exe')
