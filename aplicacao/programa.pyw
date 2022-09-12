@@ -14,7 +14,12 @@ import PySimpleGUI as sg
 import re
 
 
-print = sg.Print
+
+
+def print(texto):
+    print = sg.Print
+    print(texto)
+    print("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 
 
 def checkingLink(StatusLink):
@@ -28,7 +33,6 @@ def checkingLink(StatusLink):
             yzb = True
             while(yzb == True):
                 contador = 1 + contador
-                print('\n\nObtendo link correto', contador, '\n\n')
                 navegador.get(urlConf)
                 link = navegador.current_url
 
@@ -81,7 +85,7 @@ def conferencia(config):
             navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').clear()
             navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').send_keys(linha)
             navegador.find_element(By.XPATH,'//*[@id="btn_enviar"]').click()
-            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[7]').text
+            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[6]/span').text
             if conf == 'ESTOQUE':
                 print("\n",cont," - Status: ", conf, " Numero de serie: ", linha)
             elif conf == '':
@@ -105,8 +109,7 @@ def conferencia(config):
             while(len(colunaPdv[cont]) < 6):
                 colunaPdv[cont] = "0" + colunaPdv[cont]
             if(conf == colunaPdv[cont]):
-                print("\n",cont+1," - PDV esta correto com o sistema:",
-                      colunaPdv[cont])
+                print("\n",cont+1," - PDV esta correto com o sistema:", colunaPdv[cont])
             elif(conf != colunaPdv[cont]):
                 resultadoConfserial.append(colunaSerial[cont])
             
@@ -119,20 +122,6 @@ def conferencia(config):
                 print("\nO equipamento: ",resultadoConfserial[i], "Esta atrelado com o PDV divergente da planilha")
             sg.popup('Contém máquina de cartão\natrelado em pdv errado')
             quit()
-
-def conferenciaEstoque():
-    cont = 0
-    print("\n\n__Iniciando conferencia estoque__\n\n")
-    navegador.get("http://admin.boltcard.com.br/pos/movimento/listar")
-    checkingLink('relacaoConferencia')
-    for linha in colunaSerial:
-        navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').send_keys(linha)
-        localAtual = navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div/div/div/table/tbody/tr/td[7]').text
-        time.sleep(0.2)
-        print("\n\n\nEstoque pretentede: ",
-              colunaEstoque[cont], "Estoque atual: ", localAtual, " Numero de serie: ", linha, "\n\n\n")
-        cont += 1
-        navegador.find_element(By.XPATH,'//*[@id="dataTable_filter"]/label/input').clear()
 
 def loginAdmin(startlogin):
     url = "http://admin.boltcard.com.br/login"
@@ -168,7 +157,6 @@ def mudanca():
         time.sleep(0.5)
         navegadorPOS.find_element(By.XPATH,'//*[@id="submeter"]').click()
     print("processo finalizado\nAguarde...")
-    conferenciaEstoque()
     navegador.close()
     navegadorPOS.close()
     os.system('taskkill /f /im chromedriver.exe')
@@ -273,7 +261,17 @@ def insecao():
     os.system('taskkill /f /im chromedriver.exe')
     print("\n\n finalizado \n\n")
 
-
+def inserir_chip():
+    print("Aguarde...\nAbrindo Chrome\n")
+    loginAdmin(navegadorChip)
+    for qtd in range(colunaSerialChip.count()):
+        navegadorChip.get('http://admin.boltcard.com.br/chip/home/inserir')
+        print("{} - Número de serie: {},\npertencente a operadora {}.\n".format(qtd+1,colunaSerialChip[qtd],colunaOperadora[qtd]))
+        navegadorChip.find_element(By.XPATH,'//*[@id="form_pos"]/div[1]/div[1]/div[2]/input').send_keys(str(colunaOperadora[qtd]))
+        navegadorChip.find_element(By.XPATH,'//*[@id="form_pos"]/div[1]/div[2]/div[2]/input').send_keys(str(colunaSerialChip[qtd]))
+        navegadorChip.find_element(By.XPATH,'//*[@id="submeter"]').click()   
+    print("\nFinalizado...")
+    
 #---principal---#
 if __name__ == "__main__":
 
@@ -296,19 +294,24 @@ if __name__ == "__main__":
     senha = values[1]
     fechar = True
 
+
     while fechar == True:
         cont = 0
-        layout_menu = [[sg.Text('       Menu de Seleção\n\n1 - Mudança de Estoque\n2 - Registrar Equipamento\n3 - Alterar isenção\n0 - Finalizar')],
+        layout_menu = [[sg.Text('       Menu de Seleção\n\n1 - Mudança de Estoque\n2 - Alterar isenção\n3 - Registrar Chip\n4 - Excluir Chip\n0 - Finalizar')],
                     [
             sg.Radio(1, "RADIO1", key='Mudanca'),
-            sg.Radio(2, "RADIO1", key='Registrar POS no sistema'),
-            sg.Radio(3, "RADIO1", key='Alterar isenção'),
+            sg.Radio(2, "RADIO1", key='Alterar isenção'),
+            sg.Radio(3, "RADIO1", key='Registrar_Chip'),
+            sg.Radio(4, "RADIO1", key='exluit_Chip'),
             sg.Radio(0, "RADIO1", key='Finalizar')],
             [sg.Submit('Processeguir'),sg.Button('Cancelar')]
         ]
         window_menu = sg.Window('Login no Bolt Administrativo', layout_menu)
         event, values = window_menu.read()
         window_menu.close()
+
+
+
         if(values['Mudanca'] == True):
             tabela = pd.read_excel('mudanca.xlsx')
             colunaSerial = tabela['Serial']
@@ -319,14 +322,19 @@ if __name__ == "__main__":
             navegador.minimize_window()
             navegadorPOS.minimize_window()
             mudanca()
-        elif(values['Registrar POS no sistema'] == True):
-            sg.popup("registrar")
+        elif(values['Registrar_Chip'] == True):
+            tabela = pd.read_excel('registrar-chip.xlsx')
+            colunaSerialChip = tabela['serial_do_chip']
+            colunaOperadora = tabela['operadora']
+            qtdlinha = tabela['serial_do_chip'].count()
+            navegadorChip = webdriver.Chrome(executable_path=r'./chromedriver.exe')
+            navegadorChip.minimize_window()
+            inserir_chip()
         elif(values['Alterar isenção'] == True):
             tabela = pd.read_excel('isencao.xlsx')
             colunaSerial = tabela['Serial']
             colunaPdv = tabela['pdv']
             colunaValor = tabela['valor']
-            # dataIsencao =  tabela['dataisencao']
             qtdlinha = tabela['Serial'].count()
             navegador = webdriver.Chrome(executable_path=r'./chromedriver.exe')
             navegadorPOS = webdriver.Chrome(executable_path=r'./chromedriver.exe')
