@@ -375,7 +375,6 @@ def conferencia(config):
             navegador.find_element(By.XPATH,'//*[@id="btn_enviar"]').click()
 
             conf = navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[4]/div/div/div/table/tbody/tr/td[9]').text
-            print("cade tu porra"+conf)
             colunaPdv[cont] = str(colunaPdv[cont])
             while(len(colunaPdv[cont]) < 6):
                 colunaPdv[cont] = "0" + colunaPdv[cont]
@@ -470,6 +469,10 @@ def insecao():
             # Fim - buscar url   para alteração
             navegadorPOS.get(urlaux)
             clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[1]/div/div/button')
+
+            if Verificar_Render_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[7]/div/div/div[3]/button') == True:
+                clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[7]/div/div/div[3]/button')
+
             preencher_campo_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[6]/div/div/form/div[1]/div/div/div/select','bolt')
             clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[6]/div/div/form/div[2]/button[2]')
             navegadorPOS.get(urlaux)
