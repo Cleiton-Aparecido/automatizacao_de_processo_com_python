@@ -300,7 +300,7 @@ def checkingLink(StatusLink):
     link = navegador.current_url
     contador = 0
     if(StatusLink == 'relacaoMudanca'):
-        urlConf = "http://admin.boltcard.com.br/pos/cadastro/listar"
+        urlConf = "https://admin.boltcard.com.br/pos/cadastro/listar"
         if(link == urlConf):
             print('Verificado!')
         else:
@@ -353,7 +353,7 @@ def conferencia(config):
             navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').clear()
             navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').send_keys(linha)
             navegador.find_element(By.XPATH,'//*[@id="btn_enviar"]').click()
-            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[6]/span').text
+            conf = navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[4]/div/div/div/table/tbody/tr/td[5]/span').text
             if conf == 'ESTOQUE':
                 print("{} - Status: {} Numero de serie: {}".format(cont,conf,linha))
                 retorno = True
