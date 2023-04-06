@@ -48,6 +48,9 @@ def login_macro():
     return {"login":values[0],"senha":values[1]}
 
 def loginAdmin(startlogin,login):
+    
+    login['senha'] = 'FeD171821'
+    login['login'] = 'FELIPEALVES'
     url = "http://admin.boltcard.com.br/login"
     startlogin.get(url)
     Aguardar_render_xpath(startlogin,'/html/body/div[2]/div[2]/form/div[1]/input')
@@ -95,8 +98,8 @@ def Aguardar_render_xpath(nav, xpathcode:str) -> None:
     WebDriverWait(nav, 10).until(EC.visibility_of_element_located((By.XPATH, xpathcode)))
 
 def clicar_xpath(nav,xpath_pagina):
-    # Aguardar_render_xpath(nav,xpath_pagina)
-    time.sleep(2)
+    Aguardar_render_xpath(nav,xpath_pagina)
+    time.sleep(1)
     nav.find_element(By.XPATH,xpath_pagina).click()
 
 def preencher_campo_xpath(nav,xpath_pagina,conteudo):
@@ -373,10 +376,12 @@ def conferencia(config):
             navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').clear()
             navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input').send_keys(str(colunaSerial[cont]))
             navegador.find_element(By.XPATH,'//*[@id="btn_enviar"]').click()
-            conf = navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[11]').text
+
+            conf = navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[4]/div/div/div/table/tbody/tr/td[9]').text
             colunaPdv[cont] = str(colunaPdv[cont])
             while(len(colunaPdv[cont]) < 6):
                 colunaPdv[cont] = "0" + colunaPdv[cont]
+            
             if(conf == colunaPdv[cont]):
                 print("{} - PDV esta correto com o sistema: {}".format(cont+1,colunaPdv[cont]))
             elif(conf != colunaPdv[cont]):
@@ -402,6 +407,7 @@ def mudanca():
     loginAdmin(navegadorPOS,login_interface)
     retorno = conferencia("mudanca")
     if retorno == True:
+        print("Conferencia OK, iniciando mudanca.")
         for linha in range(qtdlinha):
             print("Alterando: {} de {},\nMudando POS:{} Para: {}.".format(linha + 1,qtdlinha,colunaSerial[linha],colunaEstoque[linha]))
             checkingLink('relacaoMudanca') #navegador
@@ -418,17 +424,36 @@ def mudanca():
     os.system('taskkill /f /im chromedriver.exe')
 
 def insecao():
-    layout = [[sg.Text('Data Isenção:'), sg.InputText()],
-            [sg.Submit('Entrar'), sg.Button('Cancelar Programa')]]
-    window = sg.Window('Data Isenção', layout,relative_location=(420,80))
-    event, values = window.read()
-    if event == sg.WIN_CLOSED or event == 'Cancelar Programa':
+
+    layoutTipCombrança =   [[sg.Radio('Data Cobrança',"RADIO1", key='data')],
+                            [sg.Radio('Isenção Permanente',"RADIO1", key='Permanente')],
+                            [sg.Radio('Isenção por Volume',"RADIO1", key='Volume')],
+                            [sg.Submit('Entrar'), sg.Button('Cancelar Programa')]]
+    window = sg.Window('Menu para cobrança', layoutTipCombrança,relative_location=(420,80))
+    event0, values0 = window.read()
+    if event0 == sg.WIN_CLOSED or event0 == 'Cancelar Programa':
         window.close()
         sg.popup('Programa encerrado')
         window.close()
         quit()
     window.close()
-    dataisencaomenu = values[0]
+    
+    if(values0['data'] == True):
+        layout = [[sg.Text('Mês: '), sg.InputText()],
+                [sg.Text('Ano: '), sg.InputText()],
+                [sg.Submit('Entrar'), sg.Button('Cancelar Programa')]]
+        window = sg.Window('Data Isenção', layout,relative_location=(420,80))
+        event, values = window.read()
+        if event == sg.WIN_CLOSED or event == 'Cancelar Programa':
+            window.close()
+            sg.popup('Programa encerrado')
+            window.close()
+            quit()
+        window.close()
+        dataisencaomenu_mes = values[0]
+        dataisencaomenu_ano = values[1]
+
+
     print("Aguarde... Sistema Carregando...\nAbrindo 1° chrome ")
     loginAdmin(navegadorPOS,login_interface)
     print("Aguarde... Sistema Carregando...\nAbrindo 2° chrome ")
@@ -443,13 +468,20 @@ def insecao():
             limpar_campo_xpath(navegador,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input')
             preencher_campo_xpath(navegador,'/html/body/div[2]/div[2]/main/div[2]/div[2]/div[1]/form/input',colunaSerial[a])
             clicar_xpath(navegador,'//*[@id="btn_enviar"]')
-            urlaux =  navegador.find_element(By.XPATH,'//*[@id="dataTable"]/tbody/tr/td[12]/a').get_attribute("href")
+            urlaux =  navegador.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[2]/div[4]/div/div/div/table/tbody/tr/td[14]/a').get_attribute("href")
             # Fim - buscar url   para alteração
             navegadorPOS.get(urlaux)
             clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[1]/div/div/button')
+
+            #------------- verifica se o campo lançamento dxc esta aberto
+            style = navegadorPOS.find_element(By.XPATH,'/html/body/div[2]/div[2]/main/div[7]').get_attribute("style")
+            if style == 'display: block; padding-right: 17px;':
+                clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[7]/div/div/div[3]/button')
+                
             preencher_campo_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[6]/div/div/form/div[1]/div/div/div/select','bolt')
             clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[6]/div/div/form/div[2]/button[2]')
             navegadorPOS.get(urlaux)
+            time.sleep(1)
             clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[2]/div[1]/div/div/div/div[2]/div/div[1]/div/div/button')
             #adicionar valores para configurar a pos com nova isenção
             colunaPdv[a] = str(colunaPdv[a])
@@ -462,10 +494,23 @@ def insecao():
             limpar_campo_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[3]/input')
             for adcValor in colunaValor[a]:
                preencher_campo_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[3]/input',adcValor) 
-            limpar_campo_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/input')
-            for adcdata in dataisencaomenu:
-                preencher_campo_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/input',adcdata)     
+
+            if(values0['Permanente']==True):
+                clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[5]/label/input')
+            elif(values0['Volume']==True):
+                clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[6]/label/input')
+            else:
+                # limpar_campo_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/div/div[1]/select')
+                for adcmes in range(3):
+                    preencher_campo_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/div/div[1]/select',dataisencaomenu_mes[adcmes])     
+                
+                # limpar_campo_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/div/div[2]/select')
+                for adcano in dataisencaomenu_ano:
+                    preencher_campo_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[1]/div/div/div[4]/div/div[2]/select',adcano)     
+            
+            
             clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[5]/div/div/form/div[2]/button[2]')
+       
             #carrega a nova pagina com a isenção alterada
             urlaux = navegadorPOS.current_url
             navegadorPOS.get(urlaux)
@@ -475,6 +520,7 @@ def insecao():
             navegadorPOS.get(url_atualiza_status)
             preencher_campo_xpath(navegadorPOS,'//*[@id="form_pos"]/div[1]/div[1]/div[3]/select','CONFIGURADO')
             clicar_xpath(navegadorPOS,'/html/body/div[2]/div[2]/main/div[2]/form/div[2]/button')
+   
     navegador.close()
     navegadorPOS.close()
     os.system('taskkill /f /im chromedriver.exe')
